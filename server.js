@@ -1,60 +1,43 @@
 const express = require("express");
-const puppeteer = require("puppeteer");
 
-console.log("🔥 FINAL VERSION RUNNING 🔥");
+console.log("🔥 TEST VERSION RUNNING 🔥");
 
 const app = express();
 
+// JSON parse
 app.use(express.json());
 
-// Debug log
+// Debug logs
 app.use((req, res, next) => {
   console.log("Incoming:", req.method, req.url);
   next();
 });
 
-// Root route
+// Root check
 app.get("/", (req, res) => {
   res.send("Server working 🚀");
 });
 
-// Render API
-app.use("/render", async (req, res) => {
-  const { url } = req.body;
+// ✅ TEST /render route
+app.all("/render", (req, res) => {
+  console.log("🔥 /render HIT 🔥");
+
+  const { url } = req.body || {};
 
   if (!url) {
     return res.status(400).json({ error: "URL required" });
   }
 
-  let browser;
+  return res.json({
+    success: true,
+    message: "Route working",
+    received: url,
+  });
+});
 
-  try {
-    browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-
-    const page = await browser.newPage();
-
-    await page.goto(url, {
-      waitUntil: "networkidle2",
-      timeout: 20000,
-    });
-
-    const html = await page.content();
-
-    res.json({
-      success: true,
-      html,
-    });
-
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      error: err.message,
-    });
-  } finally {
-    if (browser) await browser.close();
-  }
+// fallback (important)
+app.use((req, res) => {
+  res.status(404).send("Route not found");
 });
 
 const PORT = process.env.PORT || 4000;

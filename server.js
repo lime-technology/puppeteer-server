@@ -15,10 +15,9 @@ app.use((req, res, next) => {
 });
 
 // ✅ FORCE ROOT RESPONSE (IMPORTANT FIX)
-app.use("/", (req, res, next) => {
-  if (req.method === "GET" && req.url === "/") {
-    return res.send("Server working 🚀");
-  }
+app.get("/", (req, res) => {
+  res.send("Server working 🚀");
+});
   next();
 });
 

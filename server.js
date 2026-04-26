@@ -2,27 +2,21 @@ const express = require("express");
 const puppeteer = require("puppeteer");
 
 const app = express();
-
-// ===== Middleware =====
 app.use(express.json());
 
-// ===== Debug log (IMPORTANT) =====
+// Debug log
 app.use((req, res, next) => {
   console.log("Incoming:", req.method, req.url);
   next();
 });
 
-// ===== Root route (check server working) =====
+// Root route
 app.get("/", (req, res) => {
   res.send("Server working 🚀");
 });
 
-// ===== Render route (main API) =====
-app.use("/render", async (req, res) => {
-  if (req.method !== "POST") {
-    return res.status(405).send("Method Not Allowed");
-  }
-
+// ✅ FIXED ROUTE
+app.post("/render", async (req, res) => {
   const { url } = req.body;
 
   if (!url) {
@@ -34,27 +28,24 @@ app.use("/render", async (req, res) => {
   try {
     browser = await puppeteer.launch({
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      headless: "new",
     });
 
     const page = await browser.newPage();
 
     await page.goto(url, {
       waitUntil: "networkidle2",
-      timeout: 30000,
+      timeout: 20000,
     });
 
     const html = await page.content();
 
-    return res.json({
+    res.json({
       success: true,
       html,
     });
 
   } catch (err) {
-    console.error("ERROR:", err.message);
-
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       error: err.message,
     });
@@ -63,9 +54,8 @@ app.use("/render", async (req, res) => {
   }
 });
 
-// ===== PORT FIX (VERY IMPORTANT) =====
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  console.log(`Puppeteer server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

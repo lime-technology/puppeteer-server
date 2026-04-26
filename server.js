@@ -1,10 +1,9 @@
 const express = require("express");
 
-console.log("🔥 FIXED VERSION RUNNING 🔥");
+console.log("🔥 FINAL FIX RUNNING 🔥");
 
 const app = express();
 
-// JSON parser
 app.use(express.json());
 
 // Debug
@@ -13,29 +12,34 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ FIRST DEFINE /render (IMPORTANT)
-app.all("/render", (req, res) => {
+// ✅ HANDLE ALL METHODS + FORCE RESPONSE
+app.use("/render", (req, res) => {
   console.log("🔥 /render HIT 🔥");
+
+  if (req.method === "HEAD") {
+    return res.status(200).end();
+  }
 
   const { url } = req.body || {};
 
-  if (!url) {
-    return res.status(400).json({ error: "URL required" });
-  }
-
   return res.json({
     success: true,
-    message: "Render working",
-    received: url,
+    method: req.method,
+    received: url || null
   });
 });
 
-// Root AFTER
+// Test route
 app.get("/test", (req, res) => {
   res.send("TEST OK");
 });
 
-// fallback LAST
+// Root
+app.get("/", (req, res) => {
+  res.send("Server working 🚀");
+});
+
+// Fallback
 app.use((req, res) => {
   res.status(404).send("Not Found");
 });

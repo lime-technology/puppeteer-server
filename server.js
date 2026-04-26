@@ -1,6 +1,6 @@
 const express = require("express");
 const puppeteer = require("puppeteer");
-
+console.log("🔥 VERSION 2 RUNNING 🔥"); 
 const app = express();
 app.use(express.json());
 

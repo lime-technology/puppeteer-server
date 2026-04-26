@@ -1,24 +1,19 @@
 const express = require("express");
 
-console.log("🔥 TEST VERSION RUNNING 🔥");
+console.log("🔥 FIXED VERSION RUNNING 🔥");
 
 const app = express();
 
-// JSON parse
+// JSON parser
 app.use(express.json());
 
-// Debug logs
+// Debug
 app.use((req, res, next) => {
   console.log("Incoming:", req.method, req.url);
   next();
 });
 
-// Root check
-app.get("/", (req, res) => {
-  res.send("Server working 🚀");
-});
-
-// ✅ TEST /render route
+// ✅ FIRST DEFINE /render (IMPORTANT)
 app.all("/render", (req, res) => {
   console.log("🔥 /render HIT 🔥");
 
@@ -30,14 +25,19 @@ app.all("/render", (req, res) => {
 
   return res.json({
     success: true,
-    message: "Route working",
+    message: "Render working",
     received: url,
   });
 });
 
-// fallback (important)
+// Root AFTER
+app.get("/", (req, res) => {
+  res.send("Server working 🚀");
+});
+
+// fallback LAST
 app.use((req, res) => {
-  res.status(404).send("Route not found");
+  res.status(404).send("Not Found");
 });
 
 const PORT = process.env.PORT || 4000;

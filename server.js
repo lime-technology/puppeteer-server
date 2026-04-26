@@ -31,8 +31,8 @@ app.all("/render", (req, res) => {
 });
 
 // Root AFTER
-app.get("/", (req, res) => {
-  res.send("Server working 🚀");
+app.get("/test", (req, res) => {
+  res.send("TEST OK");
 });
 
 // fallback LAST

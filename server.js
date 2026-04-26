@@ -1,11 +1,10 @@
 const express = require("express");
 const puppeteer = require("puppeteer");
 
-console.log("🔥 VERSION 3 RUNNING 🔥");
+console.log("🔥 FINAL VERSION RUNNING 🔥");
 
 const app = express();
 
-// IMPORTANT
 app.use(express.json());
 
 // Debug log
@@ -14,11 +13,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ FORCE ROOT RESPONSE (IMPORTANT FIX)
+// Root route
 app.get("/", (req, res) => {
   res.send("Server working 🚀");
-});
-  next();
 });
 
 // Render API

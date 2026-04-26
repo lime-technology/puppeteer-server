@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 });
 
 // Render API
-app.post("/render", async (req, res) => {
+app.use("/render", async (req, res) => {
   const { url } = req.body;
 
   if (!url) {

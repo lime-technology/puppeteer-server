@@ -1,51 +1,53 @@
 const express = require("express");
-
-console.log("🔥 FINAL FIX RUNNING 🔥");
+const puppeteer = require("puppeteer");
 
 const app = express();
-
 app.use(express.json());
 
-// Debug
-app.use((req, res, next) => {
-  console.log("Incoming:", req.method, req.url);
-  next();
-});
-
-// ✅ HANDLE ALL METHODS + FORCE RESPONSE
-app.use("/render", (req, res) => {
-  console.log("🔥 /render HIT 🔥");
-
-  if (req.method === "HEAD") {
-    return res.status(200).end();
-  }
-
-  const { url } = req.body || {};
-
-  return res.json({
-    success: true,
-    method: req.method,
-    received: url || null
-  });
-});
-
-// Test route
-app.get("/test", (req, res) => {
-  res.send("TEST OK");
-});
-
-// Root
 app.get("/", (req, res) => {
   res.send("Server working 🚀");
 });
 
-// Fallback
-app.use((req, res) => {
-  res.status(404).send("Not Found");
+// 🔥 MAIN API
+app.post("/render", async (req, res) => {
+  const { url } = req.body;
+
+  if (!url) {
+    return res.status(400).json({ error: "URL required" });
+  }
+
+  try {
+    const browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+
+    await page.goto(url, {
+      waitUntil: "networkidle2",
+      timeout: 60000,
+    });
+
+    const screenshot = await page.screenshot({
+      fullPage: true,
+      encoding: "base64",
+    });
+
+    await browser.close();
+
+    res.json({
+      success: true,
+      image: screenshot,
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to render" });
+  }
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log("Server running on port", PORT);
 });
